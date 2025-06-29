@@ -1,0 +1,17 @@
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://yourdomain.com/sitemap.xml
+
+# Disallow admin and API routes
+Disallow: /api/
+Disallow: /admin/
+
+# Allow important pages
+Allow: /blog/
+Allow: /search
+Allow: /categorias/
+
+# Crawl delay (optional)
+Crawl-delay: 1 
