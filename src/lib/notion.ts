@@ -304,4 +304,74 @@ function calculateReadTime(text: string): number {
   const wordsPerMinute = 200
   const words = text.split(' ').length
   return Math.ceil(words / wordsPerMinute)
+}
+
+export async function getSiteConfig() {
+  console.log('🟢 getSiteConfig llamada');
+  try {
+    const configDatabaseId = process.env.NOTION_CONFIG_DATABASE_ID || databaseId
+    const response = await notion.databases.query({
+      database_id: configDatabaseId,
+      filter: {
+        property: 'Tipo',
+        select: {
+          equals: 'Configuración',
+        },
+      },
+      page_size: 1,
+    })
+
+    console.log('🟡 [getSiteConfig] Respuesta cruda de Notion:', JSON.stringify(response, null, 2))
+
+    if (response.results.length === 0) {
+      console.log('⚠️ No se encontró configuración del sitio en Notion')
+      return getDefaultSiteConfig()
+    }
+
+    const page = response.results[0] as any
+    const properties = page.properties
+    console.log('🟠 [getSiteConfig] Propiedades extraídas:', JSON.stringify(properties, null, 2))
+
+    return {
+      siteName: properties?.NombreSitio?.title?.[0]?.plain_text || 'AI Blog MVP',
+      siteDescription: properties?.Descripcion?.rich_text?.[0]?.plain_text || 'Blog sobre Inteligencia Artificial',
+      siteUrl: properties?.URLSitio?.url || 'https://tu-dominio.com',
+      logoUrl: properties?.Logo?.url || null,
+      logoAlt: properties?.LogoAlt?.rich_text?.[0]?.plain_text || 'Logo del blog',
+      faviconUrl: properties?.Favicon?.url || null,
+      ogImage: properties?.ImagenOG?.url || null,
+      twitterHandle: properties?.Twitter?.url || null,
+      githubUrl: properties?.GitHub?.url || null,
+      linkedinUrl: properties?.LinkedIn?.url || null,
+    }
+  } catch (error) {
+    console.error('Error fetching site config from Notion:', error)
+    return getDefaultSiteConfig()
+  }
+}
+
+function getDefaultSiteConfig() {
+  return {
+    siteName: 'AI Blog MVP',
+    siteDescription: 'Blog sobre Inteligencia Artificial',
+    siteUrl: 'https://tu-dominio.com',
+    logoUrl: null,
+    logoAlt: 'Logo del blog',
+    faviconUrl: null,
+    ogImage: null,
+    twitterHandle: null,
+    githubUrl: null,
+    linkedinUrl: null,
+  }
+}
+
+export async function getLogoUrl(): Promise<string | null> {
+  console.log('🟢 getLogoUrl llamada');
+  try {
+    const config = await getSiteConfig()
+    return config.logoUrl
+  } catch (error) {
+    console.error('Error getting logo URL:', error)
+    return null
+  }
 } 

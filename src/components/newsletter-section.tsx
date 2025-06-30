@@ -7,6 +7,7 @@ export function NewsletterSection() {
   const [email, setEmail] = useState('')
   const [name, setName] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [consent, setConsent] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -18,6 +19,11 @@ export function NewsletterSection() {
 
     if (!email.includes('@')) {
       toast.error('Por favor ingresa un email válido')
+      return
+    }
+
+    if (!consent) {
+      toast.error('Debes aceptar la política de privacidad para suscribirte')
       return
     }
 
@@ -90,24 +96,37 @@ export function NewsletterSection() {
                   required
                 />
               </div>
-              <button
-                type="submit"
-                disabled={isLoading}
-                className="px-8 py-3 bg-white text-primary-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
-              >
-                {isLoading ? (
-                  <div className="flex items-center">
-                    <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                    Suscribiendo...
-                  </div>
-                ) : (
-                  'Suscribirse'
-                )}
-              </button>
             </div>
+            <div className="flex items-center mt-4 mb-2 text-left">
+              <input
+                type="checkbox"
+                id="privacy-consent"
+                checked={consent}
+                onChange={e => setConsent(e.target.checked)}
+                className="mr-2 accent-blue-600"
+                required
+              />
+              <label htmlFor="privacy-consent" className="text-white text-sm select-none">
+                Acepto la <a href="/politica-de-privacidad" target="_blank" rel="noopener noreferrer" className="underline text-blue-200 hover:text-blue-400">política de privacidad</a> y el uso de mis datos para este fin.
+              </label>
+            </div>
+            <button
+              type="submit"
+              disabled={isLoading || !consent}
+              className="px-8 py-3 bg-white text-primary-600 font-semibold rounded-lg hover:bg-gray-100 transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap"
+            >
+              {isLoading ? (
+                <div className="flex items-center">
+                  <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-primary-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  Suscribiendo...
+                </div>
+              ) : (
+                'Suscribirse'
+              )}
+            </button>
           </form>
 
           <p className="text-white/70 text-sm mt-4">

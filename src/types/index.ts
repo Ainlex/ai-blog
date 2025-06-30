@@ -111,4 +111,17 @@ export interface SiteConfig {
     github: string
     linkedin: string
   }
+}
+
+export interface NotionSiteConfig {
+  siteName: string
+  siteDescription: string
+  siteUrl: string
+  logoUrl: string | null
+  logoAlt: string
+  faviconUrl: string | null
+  ogImage: string | null
+  twitterHandle: string | null
+  githubUrl: string | null
+  linkedinUrl: string | null
 } 

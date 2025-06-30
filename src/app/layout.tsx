@@ -6,6 +6,9 @@ import { Footer } from '@/components/footer'
 import { ThemeProvider } from '@/components/theme-provider'
 import { Toaster } from 'react-hot-toast'
 import { Analytics } from '@/components/analytics'
+import CookieBanner from '@/components/CookieBanner'
+import { DynamicFavicon } from '@/components/dynamic-favicon'
+import { getSiteConfig } from '@/lib/notion'
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -67,11 +70,12 @@ export const metadata: Metadata = {
   },
 }
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode
 }) {
+  const siteConfig = await getSiteConfig()
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
@@ -86,13 +90,15 @@ export default function RootLayout({
       </head>
       <body className={inter.className}>
         <ThemeProvider>
+          <DynamicFavicon />
           <div className="min-h-screen flex flex-col">
-            <Navbar />
+            <Navbar logoUrl={siteConfig.logoUrl} siteName={siteConfig.siteName} />
             <main className="flex-1">
               {children}
             </main>
-            <Footer />
+            <Footer logoUrl={siteConfig.logoUrl} siteName={siteConfig.siteName} siteDescription={siteConfig.siteDescription} />
           </div>
+          <CookieBanner />
           <Toaster
             position="bottom-right"
             toastOptions={{

@@ -4,9 +4,15 @@ import { useState } from 'react'
 import Link from 'next/link'
 import { useTheme } from './theme-provider'
 import SidebarCategories from './sidebar-categories'
+import Logo from './logo'
 import ReactDOM from 'react-dom'
 
-export function Navbar() {
+interface NavbarProps {
+  logoUrl?: string | null
+  siteName?: string
+}
+
+export function Navbar({ logoUrl, siteName = 'PromptLab' }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
   const { theme, setTheme, mounted } = useTheme()
@@ -63,12 +69,10 @@ export function Navbar() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <Link href="/" className="flex items-center space-x-2">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-purple-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-sm">AI</span>
-              </div>
-              <span className="text-xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">AI Blog MVP</span>
-            </Link>
+            <div className="flex items-center gap-2">
+              <Logo logoUrl={logoUrl} showText={false} size={90} />
+              <span className="text-base font-bold text-gray-900 dark:text-white flex items-center" style={{lineHeight: '40px', height: '40px'}}>{siteName}</span>
+            </div>
           </div>
 
           {/* Desktop Navigation */}
@@ -117,7 +121,7 @@ export function Navbar() {
 
             {/* Newsletter Button */}
             <Link
-              href="#newsletter"
+              href="/#newsletter"
               className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
             >
               Suscribirse
@@ -177,7 +181,7 @@ export function Navbar() {
                 )}
                 
                 <Link
-                  href="#newsletter"
+                  href="/#newsletter"
                   onClick={() => setIsMenuOpen(false)}
                   className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 text-sm"
                 >

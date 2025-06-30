@@ -1,13 +1,15 @@
 "use client";
 import { useEffect, useRef } from 'react'
+import { useTheme } from "./theme-provider";
 
 export default function GiscusComments() {
   const ref = useRef<HTMLDivElement>(null)
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (!ref.current) return
-    // Evitar doble inserción
-    if (ref.current.querySelector('iframe')) return
+    // Eliminar scripts previos y iframes para reinicializar Giscus al cambiar el tema
+    ref.current.innerHTML = '';
     const script = document.createElement('script')
     script.src = 'https://giscus.app/client.js'
     script.setAttribute('data-repo', 'Ainlex/comentarios-blog-ia')
@@ -19,13 +21,13 @@ export default function GiscusComments() {
     script.setAttribute('data-reactions-enabled', '1')
     script.setAttribute('data-emit-metadata', '0')
     script.setAttribute('data-input-position', 'top')
-    script.setAttribute('data-theme', 'dark_dimmed')
+    script.setAttribute('data-theme', theme === "dark" ? "dark_dimmed" : "light")
     script.setAttribute('data-lang', 'es')
     script.setAttribute('data-loading', 'lazy')
     script.crossOrigin = 'anonymous'
     script.async = true
     ref.current.appendChild(script)
-  }, [])
+  }, [theme])
 
   // Estilos para mejorar visibilidad de textos secundarios de Giscus
   useEffect(() => {
