@@ -18,8 +18,13 @@ export async function GET() {
     // Contar por cada opción de CategoriasExtra
     const counts: Record<string, number> = {}
     for (const page of response.results) {
-      if ('properties' in page && page.properties?.CategoriasExtra?.multi_select) {
-        const categorias = page.properties.CategoriasExtra.multi_select || []
+      if (
+        'properties' in page &&
+        page.properties?.CategoriasExtra &&
+        page.properties.CategoriasExtra.type === 'multi_select' &&
+        Array.isArray(page.properties.CategoriasExtra.multi_select)
+      ) {
+        const categorias = page.properties.CategoriasExtra.multi_select
         for (const cat of categorias) {
           if (!counts[cat.name]) counts[cat.name] = 0
           counts[cat.name]++

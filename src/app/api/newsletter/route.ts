@@ -17,9 +17,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({
         success: false,
         error: parsed.error.errors.map(e =>
-          typeof e.message === 'string' ? e.message :
-          typeof e.msg === 'string' ? e.msg :
-          JSON.stringify(e)
+          typeof e.message === 'string' ? e.message : JSON.stringify(e)
         ),
       }, { status: 400 })
     }

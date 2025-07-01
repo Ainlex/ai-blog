@@ -10,6 +10,7 @@ const nextConfig = {
   env: {
     CUSTOM_KEY: process.env.CUSTOM_KEY || 'default_key',
   },
+  output: 'standalone',
   async headers() {
     return [
       {
