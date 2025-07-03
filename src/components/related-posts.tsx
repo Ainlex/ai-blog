@@ -1,4 +1,5 @@
-import { getPosts } from '@/lib/notion'
+import { sanityClient } from '@/lib/sanity'
+import { relatedArticlesQuery } from '@/lib/queries'
 import { PostCard } from './post-card'
 import { Post } from '@/types'
 
@@ -9,18 +10,15 @@ interface RelatedPostsProps {
 }
 
 export async function RelatedPosts({ currentPostId, category, tags }: RelatedPostsProps) {
-  const allPosts = await getPosts()
-  
-  // Filtrar posts relacionados (misma categoría o tags similares)
-  const relatedPosts = allPosts
-    .filter(post => post.id !== currentPostId)
-    .filter(post => 
-      post.category === category || 
-      post.tags.some(tag => tags.includes(tag))
-    )
-    .slice(0, 3)
+  // Obtener artículos relacionados desde Sanity
+  const relatedPosts = await sanityClient.fetch(relatedArticlesQuery, {
+    currentId: currentPostId,
+    category,
+    tags,
+    limit: 3,
+  })
 
-  if (relatedPosts.length === 0) {
+  if (!relatedPosts || relatedPosts.length === 0) {
     return null
   }
 
@@ -30,8 +28,19 @@ export async function RelatedPosts({ currentPostId, category, tags }: RelatedPos
         Artículos Relacionados
       </h2>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        {relatedPosts.map((post) => (
-          <PostCard key={post.id} post={post} />
+        {relatedPosts.map((post: any) => (
+          <PostCard key={post._id} post={{
+            id: post._id,
+            title: post.title,
+            slug: post.slug.current,
+            excerpt: post.excerpt,
+            coverImage: post.mainImage?.url,
+            publishedAt: post.publishedAt,
+            tags: post.tags?.map((t: any) => t.title) || [],
+            category: post.categories?.[0]?.title || '',
+            author: post.author?.name || '',
+            readTime: post.readTime || 1,
+          }} />
         ))}
       </div>
     </section>

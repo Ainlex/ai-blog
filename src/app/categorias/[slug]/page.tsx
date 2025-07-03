@@ -1,9 +1,10 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { getPostsByCategory } from '@/lib/notion'
 import { PostCard } from '@/components/post-card'
 import { Pagination } from '@/components/pagination'
 import Script from 'next/script'
+import { sanityClient } from '@/lib/sanity'
+import { articlesByCategoryQuery, allArticlesQuery } from '@/lib/queries'
 
 interface CategoryPageProps {
   params: {
@@ -15,7 +16,8 @@ interface CategoryPageProps {
 }
 
 export async function generateMetadata({ params }: CategoryPageProps): Promise<Metadata> {
-  const categoryName = getCategoryName(params.slug)
+  const { slug } = await params
+  const categoryName = getCategoryName(slug)
   
   if (!categoryName) {
     return {
@@ -37,7 +39,7 @@ function getCategoryName(slug: string): string | null {
     'noticias': 'Noticias',
     'tutoriales': 'Tutoriales',
     'tendencias': 'Tendencias',
-    'casos-uso': 'Casos de Uso',
+    'casos-de-uso': 'Casos de Uso',
     'inteligencia-artificial': 'Inteligencia Artificial',
     'machine-learning': 'Machine Learning',
     'deep-learning': 'Deep Learning',
@@ -50,21 +52,55 @@ function getCategoryName(slug: string): string | null {
 }
 
 export default async function CategoryPage({ params, searchParams }: CategoryPageProps) {
-  const categoryName = getCategoryName(params.slug)
-  const page = searchParams.page ? parseInt(searchParams.page) : 1
+  const { slug } = await params
+  const { page } = await searchParams
+  const categoryName = getCategoryName(slug)
+  const pageNumber = page ? parseInt(page) : 1
   
   if (!categoryName) {
     notFound()
   }
 
-  const posts = await getPostsByCategory(categoryName)
-  
-  // Pagination
-  const limit = 12
-  const startIndex = (page - 1) * limit
-  const endIndex = startIndex + limit
-  const paginatedPosts = posts.slice(startIndex, endIndex)
-  const totalPages = Math.ceil(posts.length / limit)
+  let posts: any[] = []
+  let totalPosts = 0
+  let totalPages = 1
+  let apiError = false
+
+  try {
+    console.log(`[CategoryPage] Fetching posts for category: ${slug}`)
+    
+    // Usar Sanity Client directamente en lugar de fetch
+    if (slug) {
+      console.log('Fetching posts by category:', slug)
+      posts = await sanityClient.fetch(articlesByCategoryQuery, { category: slug })
+      console.log('Posts found for category:', slug, 'Count:', posts.length)
+    } else {
+      console.log('Fetching all published posts')
+      posts = await sanityClient.fetch(allArticlesQuery)
+      console.log('Total posts found:', posts.length)
+    }
+
+    totalPosts = posts.length
+    const limit = 12
+    totalPages = Math.ceil(totalPosts / limit)
+
+    // Aplicar paginación
+    const startIndex = (pageNumber - 1) * limit
+    const endIndex = startIndex + limit
+    posts = posts.slice(startIndex, endIndex)
+
+    console.log('Pagination:', { 
+      total: totalPosts, 
+      page: pageNumber, 
+      startIndex, 
+      endIndex, 
+      paginatedCount: posts.length 
+    })
+
+  } catch (e) {
+    console.error(`[CategoryPage] Error:`, e)
+    apiError = true
+  }
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -76,7 +112,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               {categoryName}
             </h1>
             <p className="text-xl text-gray-600 dark:text-gray-300">
-              {posts.length} artículo{posts.length !== 1 ? 's' : ''} encontrado{posts.length !== 1 ? 's' : ''} en esta categoría
+              {totalPosts} artículo{totalPosts !== 1 ? 's' : ''} encontrado{totalPosts !== 1 ? 's' : ''} en esta categoría
             </p>
           </div>
         </div>
@@ -84,7 +120,19 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
 
       {/* Content */}
       <div className="container mx-auto px-4 py-8">
-        {posts.length === 0 ? (
+        {apiError ? (
+          <div className="text-center py-12">
+            <svg className="w-16 h-16 mx-auto text-red-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+            </svg>
+            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Error al cargar los artículos de la categoría
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300">
+              Intenta recargar la página o vuelve más tarde.
+            </p>
+          </div>
+        ) : (posts.length === 0 ? (
           <div className="text-center py-12">
             <svg className="w-16 h-16 mx-auto text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
@@ -99,21 +147,21 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
         ) : (
           <>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-              {paginatedPosts.map((post) => (
-                <PostCard key={post.id} post={post} />
+              {posts.map((post: any) => (
+                <PostCard key={post._id} post={post} />
               ))}
             </div>
 
             {/* Pagination */}
             {totalPages > 1 && (
               <Pagination 
-                currentPage={page}
+                currentPage={pageNumber}
                 totalPages={totalPages}
-                baseUrl={`/categorias/${params.slug}`}
+                baseUrl={`/categorias/${slug}`}
               />
             )}
           </>
-        )}
+        ))}
       </div>
 
       {/* BreadcrumbList JSON-LD para SEO */}
@@ -138,7 +186,7 @@ export default async function CategoryPage({ params, searchParams }: CategoryPag
               '@type': 'ListItem',
               position: 3,
               name: categoryName,
-              item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/categorias/${params.slug}`,
+              item: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/categorias/${slug}`,
             },
           ],
         })}

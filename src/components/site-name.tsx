@@ -1,23 +1,24 @@
 'use client'
 
 import { useState, useEffect } from 'react'
-import { getSiteConfig } from '@/lib/notion'
+import { sanityClient } from '@/lib/sanity'
+import { siteConfigQuery } from '@/lib/queries'
 
 interface SiteNameProps {
   className?: string
   fallback?: string
 }
 
-export function SiteName({ className = '', fallback = 'AI Blog MVP' }: SiteNameProps) {
+export function SiteName({ className = '', fallback = 'PromptLab' }: SiteNameProps) {
   const [siteName, setSiteName] = useState<string>(fallback)
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     async function fetchSiteName() {
       try {
-        const config = await getSiteConfig()
-        if (config.siteName) {
-          setSiteName(config.siteName)
+        const config = await sanityClient.fetch(siteConfigQuery)
+        if (config?.title) {
+          setSiteName(config.title)
         }
       } catch (error) {
         console.error('Error fetching site name:', error)

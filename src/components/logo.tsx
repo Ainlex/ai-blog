@@ -21,12 +21,12 @@ export default function Logo({ className = '', showText = true, logoUrl, size = 
         />
       ) : (
         <div className="flex items-center justify-center mr-2" style={{ width: size, height: size }}>
-          <span className="text-blue-700 font-bold text-3xl">AI</span>
+          <span className="text-blue-700 font-bold text-3xl">PL</span>
         </div>
       )}
       {showText && (
         <span className="text-base font-semibold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent tracking-tight">
-          {typeof showText === 'string' ? showText : 'AI Blog MVP'}
+          {typeof showText === 'string' ? showText : 'PromptLab'}
         </span>
       )}
     </Link>

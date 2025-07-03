@@ -1,20 +1,21 @@
 'use client'
 
 import { useEffect } from 'react'
-import { getSiteConfig } from '@/lib/notion'
+import { sanityClient } from '@/lib/sanity'
+import { siteConfigQuery } from '@/lib/queries'
 
 export function DynamicFavicon() {
   useEffect(() => {
     async function updateFavicon() {
       try {
-        const config = await getSiteConfig()
+        const config = await sanityClient.fetch(siteConfigQuery)
         
-        if (config.faviconUrl) {
+        if (config?.favicon?.asset?.url) {
           // Crear un nuevo link element para el favicon
           const link = document.createElement('link')
           link.rel = 'icon'
           link.type = 'image/x-icon'
-          link.href = config.faviconUrl
+          link.href = config.favicon.asset.url
           
           // Remover favicon anterior si existe
           const existingFavicon = document.querySelector('link[rel="icon"]')

@@ -1,16 +1,39 @@
+# syntax=docker/dockerfile:1.4
 FROM node:18-alpine
+
+# Install dependencies
+RUN apk add --no-cache \
+    curl \
+    libc6-compat
 
 WORKDIR /app
 
-# Install dependencies
-COPY package.json package-lock.json* ./
-RUN npm ci
+# Install dependencies with cache optimization
+COPY --link package.json package-lock.json* ./
+RUN \
+    if [ -f package-lock.json ]; then npm ci; \
+    else echo "Lockfile not found." && exit 1; \
+    fi
 
-# Copy source code
-COPY . .
+# Set development environment
+ENV NODE_ENV=development \
+    NEXT_TELEMETRY_DISABLED=1 \
+    PORT=3000 \
+    HOSTNAME="0.0.0.0"
+
+# Add non-root user
+RUN addgroup --system --gid 1001 nodejs && \
+    adduser --system --uid 1001 nextjs && \
+    chown -R nextjs:nodejs /app
+
+USER nextjs
 
 # Expose port
 EXPOSE 3000
 
-# Start development server
+# Add healthcheck
+HEALTHCHECK --interval=30s --timeout=10s --start-period=40s --retries=3 \
+    CMD curl -f http://localhost:3000/api/health || exit 1
+
+# Start development server with hot reload
 CMD ["npm", "run", "dev"] 

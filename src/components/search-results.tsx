@@ -1,4 +1,6 @@
-import { searchPosts } from '@/lib/notion'
+import { useEffect, useState } from 'react'
+import { sanityClient } from '@/lib/sanity'
+import { searchArticlesQuery } from '@/lib/queries'
 import { PostCard } from './post-card'
 import { Pagination } from './pagination'
 
@@ -9,13 +11,42 @@ interface SearchResultsProps {
   page: number
 }
 
-export async function SearchResults({ query, category, tag, page }: SearchResultsProps) {
-  const posts = await searchPosts(query, category, tag)
+export function SearchResults({ query, category, tag, page }: SearchResultsProps) {
+  const [posts, setPosts] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setLoading(true)
+    setError(null)
+    const fetchData = async () => {
+      try {
+        let searchTerm = query || ''
+        const params: Record<string, any> = { searchTerm }
+        const result = await sanityClient.fetch(searchArticlesQuery, params)
+        setPosts(result)
+      } catch (err) {
+        setError('Error al buscar artículos')
+        setPosts([])
+      } finally {
+        setLoading(false)
+      }
+    }
+    fetchData()
+  }, [query, category, tag])
+
   const limit = 9
   const startIndex = (page - 1) * limit
   const endIndex = startIndex + limit
   const paginatedPosts = posts.slice(startIndex, endIndex)
   const totalPages = Math.ceil(posts.length / limit)
+
+  if (loading) {
+    return <div className="text-center py-12">Buscando artículos...</div>
+  }
+  if (error) {
+    return <div className="text-center py-12 text-red-500">{error}</div>
+  }
 
   return (
     <div className="max-w-6xl mx-auto">
@@ -54,8 +85,8 @@ export async function SearchResults({ query, category, tag, page }: SearchResult
       {posts.length > 0 && (
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
-            {paginatedPosts.map((post) => (
-              <PostCard key={post.id} post={post} />
+            {paginatedPosts.map((post: any) => (
+              <PostCard key={post._id} post={post} />
             ))}
           </div>
 

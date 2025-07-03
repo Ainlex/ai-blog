@@ -8,51 +8,54 @@ import { Toaster } from 'react-hot-toast'
 import { Analytics } from '@/components/analytics'
 import CookieBanner from '@/components/CookieBanner'
 import { DynamicFavicon } from '@/components/dynamic-favicon'
-import { getSiteConfig } from '@/lib/notion'
+import { sanityClient } from '@/lib/sanity'
+import { siteConfigQuery } from '@/lib/queries'
+import { seoConfig } from '@/lib/seo-config'
 
 const inter = Inter({ subsets: ['latin'] })
 
 export const metadata: Metadata = {
   title: {
-    default: 'AI Blog MVP - Noticias y Herramientas de Inteligencia Artificial',
-    template: '%s | AI Blog MVP'
+    default: seoConfig.defaultTitle,
+    template: `%s | ${seoConfig.siteName}`
   },
-  description: 'Descubre las últimas noticias, herramientas y guías sobre Inteligencia Artificial. Mantente actualizado con las tendencias más importantes en IA.',
-  keywords: ['inteligencia artificial', 'IA', 'machine learning', 'deep learning', 'herramientas IA', 'noticias IA'],
-  authors: [{ name: 'AI Blog MVP' }],
-  creator: 'AI Blog MVP',
-  publisher: 'AI Blog MVP',
+  description: seoConfig.defaultDescription,
+  keywords: seoConfig.pages.home.keywords,
+  authors: [{ name: seoConfig.siteName }],
+  creator: seoConfig.siteName,
+  publisher: seoConfig.siteName,
   formatDetection: {
     email: false,
     address: false,
     telephone: false,
   },
-  metadataBase: new URL('https://tudominio.com'),
+  metadataBase: new URL(seoConfig.siteUrl),
   alternates: {
-    canonical: 'https://tudominio.com',
+    canonical: seoConfig.siteUrl,
   },
   openGraph: {
     type: 'website',
-    locale: 'es_ES',
-    url: 'https://tudominio.com',
-    title: 'AI Blog MVP - Noticias y Herramientas de Inteligencia Artificial',
-    description: 'Descubre las últimas noticias, herramientas y guías sobre Inteligencia Artificial.',
-    siteName: 'AI Blog MVP',
+    locale: seoConfig.locale,
+    url: seoConfig.siteUrl,
+    title: seoConfig.defaultTitle,
+    description: seoConfig.defaultDescription,
+    siteName: seoConfig.siteName,
     images: [
       {
-        url: '/og-image.jpg',
+        url: seoConfig.defaultImage,
         width: 1200,
         height: 630,
-        alt: 'AI Blog MVP',
+        alt: seoConfig.siteName,
       },
     ],
   },
   twitter: {
-    card: 'summary_large_image',
-    title: 'AI Blog MVP - Noticias y Herramientas de Inteligencia Artificial',
-    description: 'Descubre las últimas noticias, herramientas y guías sobre Inteligencia Artificial.',
-    images: ['/og-image.jpg'],
-    creator: '@aiblogmvp',
+    card: seoConfig.social.twitter.card,
+    title: seoConfig.defaultTitle,
+    description: seoConfig.defaultDescription,
+    images: [seoConfig.defaultImage],
+    creator: seoConfig.social.twitter.creator,
+    site: seoConfig.social.twitter.site,
   },
   robots: {
     index: true,
@@ -66,7 +69,7 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    google: 'tu-google-verification-code',
+    google: process.env.NEXT_PUBLIC_GOOGLE_VERIFICATION,
   },
 }
 
@@ -75,7 +78,14 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode
 }) {
-  const siteConfig = await getSiteConfig()
+  const siteConfig = await sanityClient.fetch(siteConfigQuery) || {
+    title: 'PromptLab',
+    description: 'Blog sobre Inteligencia Artificial y Tecnología',
+    url: process.env.NEXT_PUBLIC_SITE_URL || 'https://tusitio.com',
+    logo: { url: null, alt: 'Logo del blog' },
+    siteName: 'PromptLab',
+    siteDescription: 'Blog sobre IA y Tecnología'
+  }
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
@@ -87,16 +97,18 @@ export default async function RootLayout({
         <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
         <link rel="manifest" href="/site.webmanifest" />
         <meta name="theme-color" content="#3b82f6" />
+        {/* Preload critical resources */}
+        <link rel="preload" href="/api/categorias-extra-counts" as="fetch" crossOrigin="anonymous" />
       </head>
       <body className={inter.className}>
         <ThemeProvider>
           <DynamicFavicon />
           <div className="min-h-screen flex flex-col">
-            <Navbar logoUrl={siteConfig.logoUrl} siteName={siteConfig.siteName} />
+            <Navbar logoUrl={siteConfig.logo?.url} siteName={siteConfig.title} />
             <main className="flex-1">
               {children}
             </main>
-            <Footer logoUrl={siteConfig.logoUrl} siteName={siteConfig.siteName} siteDescription={siteConfig.siteDescription} />
+            <Footer logoUrl={siteConfig.logo?.url} siteName={siteConfig.title} siteDescription={siteConfig.description} />
           </div>
           <CookieBanner />
           <Toaster

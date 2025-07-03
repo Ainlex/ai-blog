@@ -1,0 +1,17 @@
+.sanity-studio [data-ui="Transition"] {
+  transition: none !important;
+}
+
+/* Estilos adicionales para mejorar la apariencia del Studio */
+.sanity-studio {
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+  background-color: var(--my-white, #fff);
+}
+
+/* Asegurar que el Studio ocupe todo el espacio disponible */
+.sanity-studio > div {
+  height: 100%;
+  width: 100%;
+} 

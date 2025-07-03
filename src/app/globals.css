@@ -5,6 +5,51 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --card: 0 0% 100%;
+    --card-foreground: 222.2 84% 4.9%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222.2 84% 4.9%;
+    --primary: 221.2 83.2% 53.3%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 210 40% 96%;
+    --secondary-foreground: 222.2 84% 4.9%;
+    --muted: 210 40% 96%;
+    --muted-foreground: 215.4 16.3% 46.9%;
+    --accent: 210 40% 96%;
+    --accent-foreground: 222.2 84% 4.9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 221.2 83.2% 53.3%;
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 222.2 84% 4.9%;
+    --foreground: 210 40% 98%;
+    --card: 222.2 84% 4.9%;
+    --card-foreground: 210 40% 98%;
+    --popover: 222.2 84% 4.9%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217.2 91.2% 59.8%;
+    --primary-foreground: 222.2 84% 4.9%;
+    --secondary: 217.2 32.6% 17.5%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 217.2 32.6% 17.5%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 217.2 32.6% 17.5%;
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 210 40% 98%;
+    --border: 217.2 32.6% 17.5%;
+    --input: 217.2 32.6% 17.5%;
+    --ring: 224.3 76.3% 94.1%;
+  }
+
   html {
     scroll-behavior: smooth;
   }
@@ -13,45 +58,237 @@
     @apply bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100;
     font-feature-settings: 'rlig' 1, 'calt' 1;
   }
-}
 
-@layer components {
-  .btn-primary {
-    @apply bg-primary-600 hover:bg-primary-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2;
+  /* Quitar borde azul del focus cuando se hace clic con mouse */
+  :focus:not(:focus-visible) {
+    outline: none !important;
+    box-shadow: none !important;
   }
-  
-  .btn-secondary {
-    @apply bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-gray-100 font-medium py-2 px-4 rounded-lg transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2;
-  }
-  
-  .card {
-    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300;
-  }
-  
-  .gradient-text {
-    @apply bg-gradient-to-r from-primary-600 to-accent-600 bg-clip-text text-transparent;
-  }
-  
-  .glass-effect {
-    @apply backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border border-white/20 dark:border-gray-700/20;
-  }
-}
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
+  /* Mantener focus visible solo para navegación con teclado */
+  :focus-visible {
+    outline: 2px solid #3b82f6 !important;
+    outline-offset: 2px !important;
   }
-  
+
+  /* Animaciones personalizadas */
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
   .animate-fade-in {
     animation: fadeIn 0.5s ease-in-out;
   }
-  
+
   .animate-slide-up {
     animation: slideUp 0.3s ease-out;
   }
 }
 
-/* Custom scrollbar */
+@layer components {
+  /* Prevenir clics múltiples */
+  .click-disabled {
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+  /* Mejorar el focus para accesibilidad */
+  .focus-ring {
+    @apply focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2;
+  }
+
+  /* Transiciones suaves */
+  .transition-smooth {
+    @apply transition-all duration-200 ease-in-out;
+  }
+
+  /* Loading states */
+  .loading {
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700;
+  }
+
+  /* Mejorar la navegación */
+  .nav-link {
+    @apply transition-colors duration-200 hover:text-blue-600 dark:hover:text-blue-400;
+  }
+
+  /* Botones optimizados */
+  .btn-primary {
+    @apply bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+
+  .btn-secondary {
+    @apply bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white font-medium py-2 px-4 rounded-lg transition-colors duration-200;
+  }
+
+  /* Cards optimizadas */
+  .card {
+    @apply bg-white dark:bg-gray-800 rounded-xl shadow-lg border border-gray-200 dark:border-gray-700 hover:shadow-xl transition-shadow duration-300;
+  }
+
+  /* Inputs optimizados */
+  .input-field {
+    @apply w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white transition-colors duration-200;
+  }
+}
+
+@layer utilities {
+  /* Optimizar el rendimiento de las animaciones */
+  * {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* Optimizar las imágenes */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Mejorar el rendimiento de las transiciones */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+
+  /* Estilos para el modo oscuro */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      color-scheme: dark;
+    }
+  }
+
+  /* Mejorar la legibilidad del texto */
+  .text-content {
+    line-height: 1.6;
+    text-rendering: optimizeLegibility;
+  }
+
+  /* Optimizar el contraste */
+  .text-high-contrast {
+    @apply text-gray-900 dark:text-white;
+  }
+
+  /* Estados de carga */
+  .skeleton {
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
+  }
+
+  /* Mejorar la experiencia táctil */
+  @media (hover: none) and (pointer: coarse) {
+    .touch-target {
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
+
+  /* Optimizar el rendimiento de las fuentes */
+  .font-optimized {
+    font-display: swap;
+  }
+
+  /* Estados de hover mejorados */
+  .hover-lift {
+    @apply transition-transform duration-200 hover:-translate-y-1;
+  }
+
+  /* Mejorar la legibilidad del código */
+  pre, code {
+    font-family: 'Fira Code', 'Monaco', 'Consolas', 'Liberation Mono', 'Courier New', monospace;
+  }
+
+  /* Optimizar las listas */
+  ul, ol {
+    @apply space-y-2;
+  }
+
+  /* Mejorar la accesibilidad de las tablas */
+  table {
+    @apply w-full border-collapse;
+  }
+
+  th, td {
+    @apply border border-gray-300 dark:border-gray-600 px-4 py-2 text-left;
+  }
+
+  th {
+    @apply bg-gray-50 dark:bg-gray-800 font-semibold;
+  }
+
+  /* Estados de error y éxito */
+  .error {
+    @apply text-red-600 dark:text-red-400;
+  }
+
+  .success {
+    @apply text-green-600 dark:text-green-400;
+  }
+
+  .warning {
+    @apply text-yellow-600 dark:text-yellow-400;
+  }
+
+  /* Mejorar la accesibilidad de los formularios */
+  label {
+    @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2;
+  }
+
+  /* Estados de disabled */
+  .disabled {
+    @apply opacity-50 cursor-not-allowed pointer-events-none;
+  }
+
+  /* Mejorar la navegación móvil */
+  @media (max-width: 768px) {
+    .mobile-nav {
+      @apply fixed inset-0 z-50 bg-white dark:bg-gray-900;
+    }
+    
+    .mobile-nav-content {
+      @apply flex flex-col h-full;
+    }
+  }
+
+  /* Optimizar el rendimiento de las imágenes de fondo */
+  .bg-optimized {
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+
+  /* Estados de loading */
+  .loading-spinner {
+    @apply animate-spin rounded-full border-2 border-gray-300 border-t-blue-600;
+  }
+
+  /* Mejorar la navegación por teclado */
+  .skip-link {
+    @apply sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-blue-600 focus:text-white focus:rounded;
+  }
+}
+
+/* Scrollbar personalizada */
 ::-webkit-scrollbar {
   width: 8px;
 }

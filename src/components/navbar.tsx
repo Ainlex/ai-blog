@@ -1,21 +1,24 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import { useTheme } from './theme-provider'
-import SidebarCategories from './sidebar-categories'
-import Logo from './logo'
 import ReactDOM from 'react-dom'
+import { Sidebar } from './sidebar'
 
 interface NavbarProps {
-  logoUrl?: string | null
   siteName?: string
 }
 
-export function Navbar({ logoUrl, siteName = 'PromptLab' }: NavbarProps) {
+export function Navbar({ siteName = 'PromptLab' }: NavbarProps) {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
   const { theme, setTheme, mounted } = useTheme()
+
+  useEffect(() => {
+    setIsMounted(true)
+  }, [])
 
   const toggleMenu = () => setIsMenuOpen(!isMenuOpen)
   const toggleTheme = () => setTheme(theme === 'dark' ? 'light' : 'dark')
@@ -29,27 +32,13 @@ export function Navbar({ logoUrl, siteName = 'PromptLab' }: NavbarProps) {
   ]
 
   let sidebarDrawer = null
-  if (typeof window !== 'undefined' && isSidebarOpen) {
+  if (isMounted && typeof window !== 'undefined' && isSidebarOpen) {
     sidebarDrawer = ReactDOM.createPortal(
-      <div className="fixed inset-0 z-50">
-        {/* Fondo oscuro semitransparente */}
-        <div
-          className="absolute inset-0 bg-black/40 transition-opacity duration-300"
-          onClick={() => setIsSidebarOpen(false)}
-          aria-label="Cerrar menú lateral"
-        />
-        {/* Drawer lateral */}
-        <aside className="absolute left-0 top-0 h-full w-80 max-w-full bg-white dark:bg-gray-900 shadow-2xl p-0 overflow-y-auto transition-transform duration-300 transform translate-x-0 md:w-80 w-full">
-          <button
-            onClick={() => setIsSidebarOpen(false)}
-            className="absolute top-4 left-4 text-gray-500 hover:text-blue-600 z-20"
-            aria-label="Cerrar menú"
-          >
-            ✕
-          </button>
-          <SidebarCategories onClick={() => setIsSidebarOpen(false)} />
-        </aside>
-      </div>,
+      <Sidebar
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+        currentPage={typeof window !== 'undefined' ? window.location.pathname : ''}
+      />,
       document.body
     )
   }
@@ -58,21 +47,20 @@ export function Navbar({ logoUrl, siteName = 'PromptLab' }: NavbarProps) {
     <nav className="sticky top-0 z-50 bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm border-b border-gray-200 dark:border-gray-700">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
-          {/* Grupo: botón hamburguesa + logo */}
-          <div className="flex items-center gap-2 md:gap-4">
+          {/* Grupo: botón hamburguesa + título */}
+          <div className="flex items-center gap-4">
             <button
               onClick={() => setIsSidebarOpen(true)}
               className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
-              aria-label="Abrir menú de categorías"
+              aria-label="Abrir menú lateral"
             >
               <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
               </svg>
             </button>
-            <div className="flex items-center gap-2">
-              <Logo logoUrl={logoUrl} showText={false} size={90} />
-              <span className="text-base font-bold text-gray-900 dark:text-white flex items-center" style={{lineHeight: '40px', height: '40px'}}>{siteName}</span>
-            </div>
+            <Link href="/" className="flex items-center">
+              <h1 className="text-xl font-bold text-gray-900 dark:text-white">{siteName}</h1>
+            </Link>
           </div>
 
           {/* Desktop Navigation */}
@@ -81,7 +69,7 @@ export function Navbar({ logoUrl, siteName = 'PromptLab' }: NavbarProps) {
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium"
+                className="text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium rounded"
               >
                 {item.label}
               </Link>
@@ -93,7 +81,7 @@ export function Navbar({ logoUrl, siteName = 'PromptLab' }: NavbarProps) {
             {/* Search Button */}
             <Link
               href="/search"
-              className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+              className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 rounded"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -104,7 +92,7 @@ export function Navbar({ logoUrl, siteName = 'PromptLab' }: NavbarProps) {
             {mounted && (
               <button
                 onClick={toggleTheme}
-                className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 rounded"
                 aria-label="Toggle theme"
               >
                 {theme === 'dark' ? (
@@ -155,7 +143,7 @@ export function Navbar({ logoUrl, siteName = 'PromptLab' }: NavbarProps) {
                   key={item.href}
                   href={item.href}
                   onClick={() => setIsMenuOpen(false)}
-                  className="block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium"
+                  className="block text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 font-medium rounded px-2 py-1"
                 >
                   {item.label}
                 </Link>
@@ -165,7 +153,7 @@ export function Navbar({ logoUrl, siteName = 'PromptLab' }: NavbarProps) {
                 {mounted && (
                   <button
                     onClick={toggleTheme}
-                    className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200"
+                    className="p-2 text-gray-700 dark:text-gray-300 hover:text-blue-600 dark:hover:text-blue-400 transition-colors duration-200 rounded"
                     aria-label="Toggle theme"
                   >
                     {theme === 'dark' ? (
@@ -192,6 +180,8 @@ export function Navbar({ logoUrl, siteName = 'PromptLab' }: NavbarProps) {
           </div>
         )}
       </div>
+      
+      {/* Sidebar Portal */}
       {sidebarDrawer}
     </nav>
   )

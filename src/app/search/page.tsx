@@ -1,18 +1,18 @@
+'use client'
+
 import { Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import { SearchForm } from '@/components/search-form'
 import { SearchResults } from '@/components/search-results'
 import { LoadingSpinner } from '@/components/loading-spinner'
 
-interface SearchPageProps {
-  searchParams: {
-    query?: string
-    category?: string
-    tag?: string
-    page?: string
-  }
-}
+export default function SearchPage() {
+  const searchParams = useSearchParams()
+  const query = searchParams.get('query') || ''
+  const category = searchParams.get('category') || ''
+  const tag = searchParams.get('tag') || ''
+  const page = searchParams.get('page') || '1'
 
-export default function SearchPage({ searchParams }: SearchPageProps) {
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
       {/* Header */}
@@ -30,21 +30,21 @@ export default function SearchPage({ searchParams }: SearchPageProps) {
       {/* Search Form */}
       <div className="container mx-auto px-4 py-8">
         <SearchForm 
-          initialQuery={searchParams.query}
-          initialCategory={searchParams.category}
-          initialTag={searchParams.tag}
+          initialQuery={query}
+          initialCategory={category}
+          initialTag={tag}
         />
       </div>
 
       {/* Search Results */}
-      {searchParams.query && (
+      {query && (
         <div className="container mx-auto px-4 pb-16">
           <Suspense fallback={<LoadingSpinner />}>
             <SearchResults 
-              query={searchParams.query}
-              category={searchParams.category}
-              tag={searchParams.tag}
-              page={searchParams.page ? parseInt(searchParams.page) : 1}
+              query={query}
+              category={category}
+              tag={tag}
+              page={parseInt(page)}
             />
           </Suspense>
         </div>

@@ -15,61 +15,6 @@ export interface Post {
   status: 'published' | 'draft'
 }
 
-export interface NotionPage {
-  id: string
-  properties: {
-    Title: {
-      title: Array<{
-        plain_text: string
-      }>
-    }
-    Slug: {
-      rich_text: Array<{
-        plain_text: string
-      }>
-    }
-    Excerpt: {
-      rich_text: Array<{
-        plain_text: string
-      }>
-    }
-    Tags: {
-      multi_select: Array<{
-        name: string
-      }>
-    }
-    Category: {
-      select: {
-        name: string
-      }
-    }
-    Status: {
-      select: {
-        name: string
-      }
-    }
-    Featured: {
-      checkbox: boolean
-    }
-    Author: {
-      rich_text: Array<{
-        plain_text: string
-      }>
-    }
-    PublishedAt: {
-      date: {
-        start: string
-      }
-    }
-    UpdatedAt: {
-      last_edited_time: string
-    }
-    CoverImage: {
-      url: string
-    }
-  }
-}
-
 export interface SearchParams {
   query?: string
   category?: string
@@ -111,17 +56,4 @@ export interface SiteConfig {
     github: string
     linkedin: string
   }
-}
-
-export interface NotionSiteConfig {
-  siteName: string
-  siteDescription: string
-  siteUrl: string
-  logoUrl: string | null
-  logoAlt: string
-  faviconUrl: string | null
-  ogImage: string | null
-  twitterHandle: string | null
-  githubUrl: string | null
-  linkedinUrl: string | null
 } 

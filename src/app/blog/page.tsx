@@ -1,34 +1,18 @@
+'use client'
+
 import { Suspense } from 'react'
-import { Metadata } from 'next'
-import { BlogList } from '@/components/blog-list'
-import { BlogHeader } from '@/components/blog-header'
-import { LoadingSpinner } from '@/components/loading-spinner'
-import Script from 'next/script'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
+import Script from 'next/script'
+import { BlogHeader } from '@/components/blog-header'
+import { BlogList } from '@/components/blog-list'
+import { LoadingSpinner } from '@/components/loading-spinner'
 
-export const metadata: Metadata = {
-  title: 'Blog - Artículos sobre Inteligencia Artificial',
-  description: 'Explora nuestra colección de artículos sobre IA, machine learning, herramientas y tendencias tecnológicas.',
-  keywords: ['blog', 'artículos', 'inteligencia artificial', 'IA', 'machine learning'],
-  openGraph: {
-    title: 'Blog - Artículos sobre Inteligencia Artificial',
-    description: 'Explora nuestra colección de artículos sobre IA, machine learning, herramientas y tendencias tecnológicas.',
-    type: 'website',
-  },
-}
-
-interface BlogPageProps {
-  searchParams: {
-    page?: string
-    category?: string
-    tag?: string
-  }
-}
-
-export default function BlogPage({ searchParams }: BlogPageProps) {
-  const page = searchParams.page ? parseInt(searchParams.page) : 1
-  const category = searchParams.category
-  const tag = searchParams.tag
+export default function BlogPage() {
+  const searchParams = useSearchParams()
+  const page = searchParams.get('page') ? parseInt(searchParams.get('page')!) : 1
+  const category = searchParams.get('category') || ''
+  const tag = searchParams.get('tag') || ''
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-gray-900">

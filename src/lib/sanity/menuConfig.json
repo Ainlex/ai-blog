@@ -1,0 +1,98 @@
+{
+  "_type": "menuConfig",
+  "title": "Menú Principal",
+  "menuItems": [
+    {
+      "_type": "menuItem",
+      "label": "Inicio",
+      "icon": "🏠",
+      "url": "/",
+      "order": 10,
+      "isActive": true,
+      "isExternal": false
+    },
+    {
+      "_type": "menuItem",
+      "label": "Guías Gratuitas",
+      "icon": "📚",
+      "url": "/guias",
+      "order": 20,
+      "isActive": true,
+      "isExternal": false
+    },
+    {
+      "_type": "menuItem",
+      "label": "Artículos Populares",
+      "icon": "🔥",
+      "url": "/articulos-populares",
+      "order": 30,
+      "isActive": true,
+      "isExternal": false
+    },
+    {
+      "_type": "menuItem",
+      "label": "Herramientas IA",
+      "icon": "🛠️",
+      "hasSubmenu": true,
+      "order": 40,
+      "isActive": true,
+      "isExternal": false,
+      "subItems": [
+        {
+          "_type": "menuItem",
+          "label": "Para Principiantes",
+          "icon": "🎯",
+          "url": "/herramientas/principiantes",
+          "order": 10,
+          "isActive": true,
+          "isExternal": false
+        },
+        {
+          "_type": "menuItem",
+          "label": "Para Profesionales",
+          "icon": "💼",
+          "url": "/herramientas/profesionales",
+          "order": 20,
+          "isActive": true,
+          "isExternal": false
+        },
+        {
+          "_type": "menuItem",
+          "label": "Para Empresas",
+          "icon": "🏢",
+          "url": "/herramientas/empresas",
+          "order": 30,
+          "isActive": true,
+          "isExternal": false
+        }
+      ]
+    },
+    {
+      "_type": "menuItem",
+      "label": "Newsletter",
+      "icon": "📧",
+      "url": "/newsletter",
+      "order": 50,
+      "isActive": true,
+      "isExternal": false
+    },
+    {
+      "_type": "menuItem",
+      "label": "Casos de Uso",
+      "icon": "💡",
+      "url": "/casos-de-uso",
+      "order": 60,
+      "isActive": true,
+      "isExternal": false
+    },
+    {
+      "_type": "menuItem",
+      "label": "Empezar con IA",
+      "icon": "🎯",
+      "url": "/empezar",
+      "order": 70,
+      "isActive": true,
+      "isExternal": false
+    }
+  ]
+} 

@@ -1,5 +1,5 @@
 import { Metadata } from 'next'
-import { CategoriesSection } from '@/components/categories-section'
+import CategoriesSection from '@/components/categories-section'
 import Script from 'next/script'
 import Link from 'next/link'
 

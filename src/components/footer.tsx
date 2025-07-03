@@ -3,7 +3,6 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import Logo from './logo'
-import { getSiteConfig } from '@/lib/notion'
 
 interface FooterProps {
   logoUrl?: string | null

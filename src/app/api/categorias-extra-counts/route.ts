@@ -1,38 +1,38 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { Client } from '@notionhq/client'
+import { sanityClient } from '@/lib/sanity'
 
-const notion = new Client({ auth: process.env.NOTION_API_KEY })
-const databaseId = process.env.NOTION_DATABASE_ID!
-
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
-    // Obtener todos los artículos publicados
-    const response = await notion.databases.query({
-      database_id: databaseId,
-      filter: {
-        property: 'Estado',
-        select: { equals: 'Listo' },
-      },
-      page_size: 100,
-    })
-    // Contar por cada opción de CategoriasExtra
+    // Query para obtener conteos de artículos por categoría
+    const query = `
+      *[_type == "category"] {
+        _id,
+        title,
+        "slug": slug.current,
+        "articleCount": count(*[_type == "article" && publishedAt <= now() && references(^._id)])
+      } | order(title asc)
+    `
+    
+    const categories = await sanityClient.fetch(query)
+    
+    // Convertir a formato de conteos por nombre de categoría
     const counts: Record<string, number> = {}
-    for (const page of response.results) {
-      if (
-        'properties' in page &&
-        page.properties?.CategoriasExtra &&
-        page.properties.CategoriasExtra.type === 'multi_select' &&
-        Array.isArray(page.properties.CategoriasExtra.multi_select)
-      ) {
-        const categorias = page.properties.CategoriasExtra.multi_select
-        for (const cat of categorias) {
-          if (!counts[cat.name]) counts[cat.name] = 0
-          counts[cat.name]++
-        }
-      }
-    }
-    return NextResponse.json({ success: true, counts })
+    categories.forEach((cat: any) => {
+      counts[cat.title] = cat.articleCount
+    })
+    
+    return NextResponse.json({
+      success: true,
+      counts,
+      categories
+    })
   } catch (error) {
-    return NextResponse.json({ success: false, error: 'Error al contar categorías.' }, { status: 500 })
+    console.error('Error fetching category counts:', error)
+    return NextResponse.json({
+      success: false,
+      counts: {},
+      categories: [],
+      error: 'Error interno del servidor'
+    }, { status: 500 })
   }
 } 
